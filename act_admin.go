@@ -16,9 +16,13 @@ func do_shutdown(bot *Bot, msg *kbchat.SubscriptionMessage, args []string) error
 func do_print_admins(bot *Bot, msg *kbchat.SubscriptionMessage, args []string) error {
 	var sb strings.Builder
 	sb.WriteString("Admins are: ")
+	isFirst := true
 	for _, v := range bot.admins {
+		if !isFirst {
+			sb.WriteString(", ")
+		}
 		sb.WriteString(v)
-		sb.WriteString(",")
+		isFirst = false
 	}
 	return bot.ReplyTo(msg, sb.String())
 }
