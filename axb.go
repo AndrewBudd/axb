@@ -39,7 +39,7 @@ func (b *Bot) SendToUser(user string, message string) error {
 	return err
 }
 
-func NewBot(debugTeamName string, keybaseLocation string, interp interpfunc) (*bot, error) {
+func NewBot(debugTeamName string, keybaseLocation string, interp interpfunc) (*Bot, error) {
 	chatAPI, err := kbchat.Start(kbchat.RunOptions{KeybaseLocation: keybaseLocation})
 
 	if err != nil {
