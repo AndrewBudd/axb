@@ -10,7 +10,7 @@ import (
 	"github.com/keybase/go-keybase-chat-bot/kbchat"
 )
 
-type interpfunc func(*Bot, string, string) error
+type interpfunc func(*Bot, *kbchat.SubscriptionMessage, string) error
 
 type Bot struct {
 	chatAPI       *kbchat.API
@@ -28,6 +28,15 @@ func (b *Bot) Debug(format string, args ...interface{}) {
 	if err := b.API().SendMessageByTeamName(b.debugTeamName, msg, nil); err != nil {
 		fmt.Printf("Error sending message; %s", err.Error())
 	}
+}
+
+func (b *Bot) ReplyTo(msg kbchat.SubscriptionMessage, user string, format string, args ...interface{}) error {
+	message := fmt.Sprintf(format, args...)
+	err := b.API().SendMessage(msg.Message.Channel, message)
+	if err != nil {
+		b.Debug(err.Error())
+	}
+	return err
 }
 
 func (b *Bot) SendToUser(user string, format string, args ...interface{}) error {
@@ -85,9 +94,9 @@ func NewBot(debugTeamName string, keybaseLocation string, interp interpfunc) (*B
 				continue
 			}
 
-			b.Debug("Received message, channel: %s, username: %s, message: %s", msg.Message.Channel.Name, msg.Message.Sender.Username, msg.Message.Content.Text.Body)
+			b.Debug("Received message, channel: %s, username: %s, message: %s, type: %s", msg.Message.Channel.Name, msg.Message.Sender.Username, msg.Message.Content.Text.Body, msg.Message.Channel.MembersType)
 
-			err = b.interp(&b, msg.Message.Sender.Username, msg.Message.Content.Text.Body)
+			err = b.interp(&b, &msg, msg.Message.Content.Text.Body)
 			if err != nil {
 				b.Debug("Error calling interp: %s", err.Error())
 			}
