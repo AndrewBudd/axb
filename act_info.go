@@ -16,11 +16,11 @@ func doHelp(bot *Bot, msg *kbchat.SubscriptionMessage, args []string) error {
 			continue
 		}
 		if !isFirst {
-			sb.WriteString(",")
+			sb.WriteString(", ")
 		}
 		sb.WriteString("'")
 		sb.WriteString(k)
-		sb.WriteString("' ")
+		sb.WriteString("'")
 		isFirst = false
 	}
 	return bot.ReplyTo(msg, sb.String())
