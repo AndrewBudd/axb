@@ -2,7 +2,7 @@
 AXB is a lightweight wrapper around go-keybase-chat-bot (https://github.com/keybase/go-keybase-chat-bot/) which slightly simplifies the process of building a keybase bot.  See the example below for how to get started.  
 
 ## Example
-```
+```go
 import (
 	"os"
 	"github.com/AndrewBudd/axb"
