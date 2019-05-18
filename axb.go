@@ -30,9 +30,10 @@ func (b *Bot) Debug(format string, args ...interface{}) {
 	}
 }
 
-func (b *Bot) SendToUser(user string, message string) error {
+func (b *Bot) SendToUser(user string, format string, args ...interface{}) error {
+	msg := fmt.Sprintf(format, args...)
 	tlfName := fmt.Sprintf("%s,%s", user, b.API().GetUsername())
-	err := b.API().SendMessageByTlfName(tlfName, message)
+	err := b.API().SendMessageByTlfName(tlfName, msg)
 	if err != nil {
 		b.Debug(err.Error())
 	}
@@ -75,6 +76,16 @@ func NewBot(debugTeamName string, keybaseLocation string, interp interpfunc) (*B
 				b.Debug("Error reading message (nonfatal): %s", err.Error())
 				continue
 			}
+
+			if msg.Message.Content.Type != "text" {
+				continue
+			}
+
+			if msg.Message.Sender.Username == b.API().GetUsername() {
+				continue
+			}
+
+			b.Debug("Received message, channel: %s, username: %s, message: %s", msg.Message.Channel.Name, msg.Message.Sender.Username, msg.Message.Content.Text.Body)
 
 			err = b.interp(&b, msg.Message.Sender.Username, msg.Message.Content.Text.Body)
 			if err != nil {
