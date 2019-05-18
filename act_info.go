@@ -6,8 +6,8 @@ import (
 	"github.com/keybase/go-keybase-chat-bot/kbchat"
 )
 
-func do_help(bot *Bot, msg *kbchat.SubscriptionMessage, args []string) error {
-	isAdmin := bot.isAdmin(msg.Message.Sender.Username)
+func doHelp(bot *Bot, msg *kbchat.SubscriptionMessage, args []string) error {
+	isAdmin := bot.IsFromAdmin(msg)
 	var sb strings.Builder
 	sb.WriteString("You have access to the following commands: ")
 	isFirst := true

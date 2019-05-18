@@ -6,73 +6,86 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"sync"
 
 	"github.com/keybase/go-keybase-chat-bot/kbchat"
 )
 
 var builtInCommands = map[string]BotCommand{
 	"help": {
-		do_help,
+		doHelp,
 		false,
 	},
 	"shutdown": {
-		do_shutdown,
+		doShutdown,
 		true,
 	},
-	"print_admins": {
-		do_print_admins,
+	"printadmins": {
+		doPrintAdmins,
 		true,
 	},
-	"add_admin": {
-		do_add_admin,
+	"addadmin": {
+		doAddAdmin,
 		true,
 	},
-	"remove_admin": {
-		do_remove_admin,
+	"removeadmin": {
+		doRemoveAdmin,
 		true,
 	},
 }
 
+// Bot is an internal data structure used by the Bot
 type Bot struct {
+	In            sync.Mutex
+	Out           sync.Mutex
 	chatAPI       *kbchat.API
 	debugTeamName string
 	admins        []string
 	commands      map[string]BotCommand
 }
 
-func (b *Bot) API() *kbchat.API {
-	return b.chatAPI
+// API returns the underlying kbchat API struct
+func (bot *Bot) API() *kbchat.API {
+	return bot.chatAPI
 }
 
-func (b *Bot) Debug(format string, args ...interface{}) {
+// Debug prints to stderr, as well as the debug team
+func (bot *Bot) Debug(format string, args ...interface{}) {
+	bot.Out.Lock()
+	defer bot.Out.Unlock()
 	msg := fmt.Sprintf(format, args...)
-
 	fmt.Errorf(msg)
-
-	if err := b.API().SendMessageByTeamName(b.debugTeamName, msg, nil); err != nil {
+	if err := bot.API().SendMessageByTeamName(bot.debugTeamName, msg, nil); err != nil {
 		fmt.Errorf("Error sending message; %s", err.Error())
 	}
 }
 
-func (b *Bot) ReplyTo(msg *kbchat.SubscriptionMessage, format string, args ...interface{}) error {
+// ReplyTo sends a message to the origin of a message
+func (bot *Bot) ReplyTo(msg *kbchat.SubscriptionMessage, format string, args ...interface{}) error {
+	bot.Out.Lock()
+	defer bot.Out.Unlock()
 	message := fmt.Sprintf(format, args...)
-	err := b.API().SendMessage(msg.Message.Channel, message)
+	err := bot.API().SendMessage(msg.Message.Channel, message)
 	if err != nil {
-		b.Debug(err.Error())
+		bot.Debug(err.Error())
 	}
 	return err
 }
 
-func (b *Bot) SendToUser(user string, format string, args ...interface{}) error {
+// SendToUser sends a message to a particular user
+func (bot *Bot) SendToUser(user string, format string, args ...interface{}) error {
+	bot.Out.Lock()
+	defer bot.Out.Unlock()
 	msg := fmt.Sprintf(format, args...)
-	tlfName := fmt.Sprintf("%s,%s", user, b.API().GetUsername())
-	err := b.API().SendMessageByTlfName(tlfName, msg)
+	tlfName := fmt.Sprintf("%s,%s", user, bot.API().GetUsername())
+	err := bot.API().SendMessageByTlfName(tlfName, msg)
 	if err != nil {
-		b.Debug(err.Error())
+		bot.Debug(err.Error())
 	}
 	return err
 }
 
+// NewBot is used to initialize and connect a new bot
 func NewBot(debugTeamName string, keybaseLocation string, commands map[string]BotCommand, admins []string) (*Bot, error) {
 	chatAPI, err := kbchat.Start(kbchat.RunOptions{KeybaseLocation: keybaseLocation})
 	targetCommands := make(map[string]BotCommand)

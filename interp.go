@@ -7,12 +7,14 @@ import (
 	"github.com/keybase/go-keybase-chat-bot/kbchat"
 )
 
+// BotCommand describes a BotCommand
 type BotCommand struct {
 	Function      func(*Bot, *kbchat.SubscriptionMessage, []string) error
 	AdminRequired bool
 }
 
-func (bot *Bot) isAdmin(user string) bool {
+// IsAdmin returns true if the user passed in is an admin
+func (bot *Bot) IsAdmin(user string) bool {
 	for _, n := range bot.admins {
 		if user == n {
 			return true
@@ -21,9 +23,15 @@ func (bot *Bot) isAdmin(user string) bool {
 	return false
 }
 
+// IsFromAdmin returns true if the message is from an admin user, false otherwise
+func (bot *Bot) IsFromAdmin(msg *kbchat.SubscriptionMessage) bool {
+	return bot.IsAdmin(msg.Message.Sender.Username)
+}
+
 func (bot *Bot) interp(msg *kbchat.SubscriptionMessage, message string) error {
-	user := msg.Message.Sender.Username
-	oneonone := true
+	bot.In.Lock()
+	defer bot.In.Unlock()
+	oneOnOne := true
 
 	args := strings.Split(message, " ")
 	// are you talking to me?
@@ -31,12 +39,8 @@ func (bot *Bot) interp(msg *kbchat.SubscriptionMessage, message string) error {
 		if len(args) == 0 || args[0] != "@"+bot.API().GetUsername() {
 			return nil
 		}
-		oneonone = false
+		oneOnOne = false
 		args = args[1:]
-	}
-
-	if len(args) == 0 && oneonone {
-		return bot.ReplyTo(msg, "Huh???")
 	}
 
 	// dumb to do every time but it's just the beginning here
@@ -48,16 +52,13 @@ func (bot *Bot) interp(msg *kbchat.SubscriptionMessage, message string) error {
 
 	for _, k := range keys {
 		if strings.HasPrefix(k, strings.ToLower(args[0])) {
-			if bot.commands[k].AdminRequired == true {
-				if bot.isAdmin(user) {
-					return bot.commands[k].Function(bot, msg, args)
-				}
-				break
+			if bot.commands[k].AdminRequired == true && !bot.IsFromAdmin(msg) {
+				continue
 			}
 			return bot.commands[k].Function(bot, msg, args)
 		}
 	}
-	if oneonone {
+	if oneOnOne {
 		return bot.ReplyTo(msg, "Huh???")
 	}
 
