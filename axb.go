@@ -19,6 +19,18 @@ var builtInCommands = map[string]BotCommand{
 		do_shutdown,
 		true,
 	},
+	"print_admins": {
+		do_print_admins,
+		true,
+	},
+	"add_admin": {
+		do_add_admin,
+		true,
+	},
+	"remove_admin": {
+		do_remove_admin,
+		true,
+	},
 }
 
 type Bot struct {
@@ -63,7 +75,7 @@ func (b *Bot) SendToUser(user string, format string, args ...interface{}) error 
 
 func NewBot(debugTeamName string, keybaseLocation string, commands map[string]BotCommand, admins []string) (*Bot, error) {
 	chatAPI, err := kbchat.Start(kbchat.RunOptions{KeybaseLocation: keybaseLocation})
-	var targetCommands map[string]BotCommand
+	targetCommands := make(map[string]BotCommand)
 
 	if err != nil {
 		return nil, err
