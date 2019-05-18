@@ -96,7 +96,7 @@ func NewBot(debugTeamName string, keybaseLocation string, interp interpfunc) (*B
 				continue
 			}
 
-			b.Debug("Received message, channel: %s, username: %s, message: %s, type: %s", msg.Message.Channel.Name, msg.Message.Sender.Username, msg.Message.Content.Text.Body, msg.Message.Channel.MembersType)
+			// b.Debug("Received message, channel: %s, username: %s, message: %s, type: %s", msg.Message.Channel.Name, msg.Message.Sender.Username, msg.Message.Content.Text.Body, msg.Message.Channel.MembersType)
 
 			err = b.interp(&b, &msg, msg.Message.Content.Text.Body)
 			if err != nil {
