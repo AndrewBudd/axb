@@ -8,8 +8,8 @@ import (
 )
 
 type BotCommand struct {
-	function      func(*Bot, *kbchat.SubscriptionMessage, []string) error
-	adminRequired bool
+	Function      func(*Bot, *kbchat.SubscriptionMessage, []string) error
+	AdminRequired bool
 }
 
 func (bot *Bot) isAdmin(user string) bool {
@@ -48,13 +48,13 @@ func (bot *Bot) interp(msg *kbchat.SubscriptionMessage, message string) error {
 
 	for _, k := range keys {
 		if strings.HasPrefix(k, strings.ToLower(args[0])) {
-			if bot.commands[k].adminRequired == true {
+			if bot.commands[k].AdminRequired == true {
 				if bot.isAdmin(user) {
-					return bot.commands[k].function(bot, msg, args)
+					return bot.commands[k].Function(bot, msg, args)
 				}
 				break
 			}
-			return bot.commands[k].function(bot, msg, args)
+			return bot.commands[k].Function(bot, msg, args)
 		}
 	}
 	if oneonone {

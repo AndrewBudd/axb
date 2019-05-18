@@ -11,7 +11,7 @@ func do_help(bot *Bot, msg *kbchat.SubscriptionMessage, args []string) error {
 	var sb strings.Builder
 	sb.WriteString("You have access to the following commands:")
 	for k, v := range bot.commands {
-		if v.adminRequired == true && !isAdmin {
+		if v.AdminRequired == true && !isAdmin {
 			continue
 		}
 		sb.WriteString(" '")
