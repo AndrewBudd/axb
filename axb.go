@@ -25,8 +25,10 @@ func (b *Bot) API() *kbchat.API {
 func (b *Bot) Debug(format string, args ...interface{}) {
 	msg := fmt.Sprintf(format, args...)
 
+	fmt.Errorf(msg)
+
 	if err := b.API().SendMessageByTeamName(b.debugTeamName, msg, nil); err != nil {
-		fmt.Printf("Error sending message; %s", err.Error())
+		fmt.Errorf("Error sending message; %s", err.Error())
 	}
 }
 
