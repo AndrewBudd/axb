@@ -30,7 +30,7 @@ func (b *Bot) Debug(format string, args ...interface{}) {
 	}
 }
 
-func (b *Bot) ReplyTo(msg kbchat.SubscriptionMessage, user string, format string, args ...interface{}) error {
+func (b *Bot) ReplyTo(msg kbchat.SubscriptionMessage, format string, args ...interface{}) error {
 	message := fmt.Sprintf(format, args...)
 	err := b.API().SendMessage(msg.Message.Channel, message)
 	if err != nil {
