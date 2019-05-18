@@ -5,7 +5,6 @@ AXB is a lightweight framework which simplifies the process of building a keybas
 ```
 import (
 	"os"
-
 	"github.com/AndrewBudd/axb"
 )
 
@@ -19,9 +18,8 @@ var commands = map[string]axb.BotCommand{
 var admins = []string{"andrewbudd"}
 
 func doHello(bot *axb.Bot, msg *kbchat.SubscriptionMessage, args []string) error {
-    return bot.ReplyTo(msg, "Hello yourself!")
+	return bot.ReplyTo(msg, "Hello yourself!")
 }
-
 
 func main() {
 	axb.NewBot(os.Getenv("KEYBASE_DEBUG_TEAM"), os.Getenv("KEYBASE_LOCATION"), commands, admins)
