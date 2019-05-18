@@ -10,19 +10,19 @@ import (
 	"github.com/keybase/go-keybase-chat-bot/kbchat"
 )
 
-type interpfunc func(*bot, string, string) error
+type interpfunc func(*Bot, string, string) error
 
-type bot struct {
+type Bot struct {
 	chatAPI       *kbchat.API
 	debugTeamName string
 	interp        interpfunc
 }
 
-func (b *bot) API() *kbchat.API {
+func (b *Bot) API() *kbchat.API {
 	return b.chatAPI
 }
 
-func (b *bot) Debug(format string, args ...interface{}) {
+func (b *Bot) Debug(format string, args ...interface{}) {
 	msg := fmt.Sprintf(format, args...)
 
 	if err := b.API().SendMessageByTeamName(b.debugTeamName, msg, nil); err != nil {
@@ -30,7 +30,7 @@ func (b *bot) Debug(format string, args ...interface{}) {
 	}
 }
 
-func (b *bot) SendToUser(user string, message string) error {
+func (b *Bot) SendToUser(user string, message string) error {
 	tlfName := fmt.Sprintf("%s,%s", user, b.API().GetUsername())
 	err := b.API().SendMessageByTlfName(tlfName, message)
 	if err != nil {
@@ -47,7 +47,7 @@ func NewBot(debugTeamName string, keybaseLocation string, interp interpfunc) (*b
 
 	}
 
-	b := bot{
+	b := Bot{
 		chatAPI:       chatAPI,
 		debugTeamName: debugTeamName,
 		interp:        interp,
