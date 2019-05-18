@@ -10,12 +10,22 @@ import (
 	"github.com/keybase/go-keybase-chat-bot/kbchat"
 )
 
-type interpfunc func(*Bot, *kbchat.SubscriptionMessage, string) error
+var builtInCommands = map[string]BotCommand{
+	"help": {
+		do_help,
+		false,
+	},
+	"shutdown": {
+		do_shutdown,
+		true,
+	},
+}
 
 type Bot struct {
 	chatAPI       *kbchat.API
 	debugTeamName string
-	interp        interpfunc
+	admins        []string
+	commands      map[string]BotCommand
 }
 
 func (b *Bot) API() *kbchat.API {
@@ -51,18 +61,29 @@ func (b *Bot) SendToUser(user string, format string, args ...interface{}) error 
 	return err
 }
 
-func NewBot(debugTeamName string, keybaseLocation string, interp interpfunc) (*Bot, error) {
+func NewBot(debugTeamName string, keybaseLocation string, commands map[string]BotCommand, admins []string) (*Bot, error) {
 	chatAPI, err := kbchat.Start(kbchat.RunOptions{KeybaseLocation: keybaseLocation})
+	var targetCommands map[string]BotCommand
 
 	if err != nil {
 		return nil, err
 
 	}
 
+	for k, v := range builtInCommands {
+		targetCommands[k] = v
+	}
+
+	// allow the user to clobber the built-in commands
+	for k, v := range commands {
+		targetCommands[k] = v
+	}
+
 	b := Bot{
 		chatAPI:       chatAPI,
 		debugTeamName: debugTeamName,
-		interp:        interp,
+		commands:      targetCommands,
+		admins:        admins,
 	}
 
 	if err = chatAPI.SendMessageByTeamName(debugTeamName, "Starting up...", nil); err != nil {
@@ -98,7 +119,7 @@ func NewBot(debugTeamName string, keybaseLocation string, interp interpfunc) (*B
 
 			// b.Debug("Received message, channel: %s, username: %s, message: %s, type: %s", msg.Message.Channel.Name, msg.Message.Sender.Username, msg.Message.Content.Text.Body, msg.Message.Channel.MembersType)
 
-			err = b.interp(&b, &msg, msg.Message.Content.Text.Body)
+			err = b.interp(&msg, msg.Message.Content.Text.Body)
 			if err != nil {
 				b.Debug("Error calling interp: %s", err.Error())
 			}
