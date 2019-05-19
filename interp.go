@@ -39,7 +39,7 @@ func (bot *Bot) interp(msg *kbchat.SubscriptionMessage, message string) error {
 	s.Init(strings.NewReader(message))
 	var args []string
 	for tok := s.Scan(); tok != scanner.EOF; tok = s.Scan() {
-		args = append(args, s.TokenText())
+		args = append(args, strings.Replace(s.TokenText(), "\"", "", -1))
 	}
 
 	// are you talking to me?
