@@ -3,8 +3,8 @@ package axb
 import (
 	"sort"
 	"strings"
-	"text/scanner"
 
+	"github.com/kballard/go-shellquote"
 	"github.com/keybase/go-keybase-chat-bot/kbchat"
 )
 
@@ -35,20 +35,14 @@ func (bot *Bot) interp(msg *kbchat.SubscriptionMessage, message string) error {
 	oneOnOne := true
 
 	// use a tokenizer so that quotes and things are handled right
-	var s scanner.Scanner
-	s.Init(strings.NewReader(message))
-	var args []string
-	for tok := s.Scan(); tok != scanner.EOF; tok = s.Scan() {
-		args = append(args, strings.Replace(s.TokenText(), "\"", "", -1))
-	}
+	args, err := shellquote.Split(message)
 
 	bot.Debug("Tokenizer found: %v", strings.Join(args, ","))
 
 	// are you talking to me?
 	if !strings.Contains(msg.Message.Channel.Name, ",") {
-		if len(args) < 3 ||
-			(args[0] != "@" && args[0] != "!") ||
-			args[1] != bot.API().GetUsername() {
+		if len(args) != 0 ||
+			args[1] != "@"+bot.API().GetUsername() {
 			return nil
 		}
 		oneOnOne = false
