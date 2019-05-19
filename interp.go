@@ -44,7 +44,7 @@ func (bot *Bot) interp(msg *kbchat.SubscriptionMessage, message string) error {
 
 	// are you talking to me?
 	if !strings.Contains(msg.Message.Channel.Name, ",") {
-		if len(args) == 0 || args[0] != "@"+bot.API().GetUsername() {
+		if len(args) == 0 || args[0] != "!"+bot.API().GetUsername() {
 			return nil
 		}
 		oneOnOne = false
