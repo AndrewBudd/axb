@@ -1,8 +1,8 @@
 # Introduction
-AXB is a lightweight framework which simplifies the process of building a keybase bot.  See the example below for how to get started.
+AXB is a lightweight wrapper around go-keybase-chat-bot (https://github.com/keybase/go-keybase-chat-bot/) which slightly simplifies the process of building a keybase bot.  See the example below for how to get started.  
 
 ## Example
-```
+```go
 import (
 	"os"
 	"github.com/AndrewBudd/axb"
@@ -34,3 +34,6 @@ The bot includes a number of built in commands, specifically
 * addadmin - adds an admin user
 * removeadmin - removes an admin user
 * shutdown - shuts down the bot
+
+## Credits
+Credit where it is due, this only works because it is built upon the awesome underlying kbchat package from the keybase folks, and I received some great input from @xgess as a reference.
