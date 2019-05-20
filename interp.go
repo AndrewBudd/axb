@@ -40,7 +40,7 @@ func (bot *Bot) interp(msg *kbchat.SubscriptionMessage, message string) error {
 		return err
 	}
 
-	bot.Debug("Tokenizer found: %v", strings.Join(args, ","))
+	//bot.Debug("Tokenizer found: %v", strings.Join(args, ","))
 
 	// are you talking to me?
 	if !strings.Contains(msg.Message.Channel.Name, ",") {
