@@ -37,10 +37,8 @@ func (bot *Bot) interp(msg *kbchat.SubscriptionMessage, message string) error {
 	// use a tokenizer so that quotes and things are handled right
 	args, err := shellquote.Split(message)
 	if err != nil {
-		return err
+		return nil // super chatty, cause lots of things don't parse
 	}
-
-	//bot.Debug("Tokenizer found: %v", strings.Join(args, ","))
 
 	// are you talking to me?
 	if !strings.Contains(msg.Message.Channel.Name, ",") {
