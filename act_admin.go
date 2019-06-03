@@ -8,6 +8,9 @@ import (
 )
 
 func doShutdown(bot *Bot, msg *kbchat.SubscriptionMessage, args []string) error {
+	if len(args) != 3 || args[1] != "bot" || args[2] != "now" {
+		return bot.ReplyTo(msg, "you must `shutdown bot now`")
+	}
 	bot.ReplyTo(msg, "Goodbye cruel world!")
 	os.Exit(0)
 	return nil
