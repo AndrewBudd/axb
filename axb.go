@@ -55,7 +55,7 @@ func (bot *Bot) Debug(format string, args ...interface{}) {
 	defer bot.Out.Unlock()
 	msg := fmt.Sprintf(format, args...)
 	fmt.Errorf(msg)
-	if _, err := bot.API().SendMessageByTeamName(bot.debugTeamName, nil, msg, nil); err != nil {
+	if _, err := bot.API().SendMessageByTeamName(bot.debugTeamName, nil, msg); err != nil {
 		fmt.Errorf("Error sending message; %s", err.Error())
 	}
 }
@@ -111,7 +111,7 @@ func NewBot(debugTeamName string, keybaseLocation string, commands map[string]Bo
 		admins:        admins,
 	}
 
-	if _, err = chatAPI.SendMessageByTeamName(debugTeamName, nil, "Starting up...", nil); err != nil {
+	if _, err = chatAPI.SendMessageByTeamName(debugTeamName, nil, "Starting up..."); err != nil {
 		return nil, err
 	}
 
