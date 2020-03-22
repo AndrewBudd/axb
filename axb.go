@@ -55,7 +55,7 @@ func (bot *Bot) Debug(format string, args ...interface{}) {
 	defer bot.Out.Unlock()
 	msg := fmt.Sprintf(format, args...)
 	fmt.Errorf(msg)
-	if err := bot.API().SendMessageByTeamName(bot.debugTeamName, msg, nil); err != nil {
+	if _, err := bot.API().SendMessageByTeamName(bot.debugTeamName, nil, msg, nil); err != nil {
 		fmt.Errorf("Error sending message; %s", err.Error())
 	}
 }
@@ -65,7 +65,7 @@ func (bot *Bot) ReplyTo(msg *kbchat.SubscriptionMessage, format string, args ...
 	bot.Out.Lock()
 	defer bot.Out.Unlock()
 	message := fmt.Sprintf(format, args...)
-	err := bot.API().SendMessage(msg.Message.Channel, message)
+	_, err := bot.API().SendMessage(msg.Message.Channel, message)
 	if err != nil {
 		bot.Debug(err.Error())
 	}
@@ -78,7 +78,7 @@ func (bot *Bot) SendToUser(user string, format string, args ...interface{}) erro
 	defer bot.Out.Unlock()
 	msg := fmt.Sprintf(format, args...)
 	tlfName := fmt.Sprintf("%s,%s", user, bot.API().GetUsername())
-	err := bot.API().SendMessageByTlfName(tlfName, msg)
+	_, err := bot.API().SendMessageByTlfName(tlfName, msg)
 	if err != nil {
 		bot.Debug(err.Error())
 	}
@@ -111,7 +111,7 @@ func NewBot(debugTeamName string, keybaseLocation string, commands map[string]Bo
 		admins:        admins,
 	}
 
-	if err = chatAPI.SendMessageByTeamName(debugTeamName, "Starting up...", nil); err != nil {
+	if _, err = chatAPI.SendMessageByTeamName(debugTeamName, nil, "Starting up...", nil); err != nil {
 		return nil, err
 	}
 
@@ -134,7 +134,7 @@ func NewBot(debugTeamName string, keybaseLocation string, commands map[string]Bo
 				continue
 			}
 
-			if msg.Message.Content.Type != "text" {
+			if msg.Message.Content.TypeName != "text" {
 				continue
 			}
 
